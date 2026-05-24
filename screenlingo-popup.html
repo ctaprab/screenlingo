@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ScreenLingo — ข้อความ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:rgba(0,0,0,0.82);
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  user-select:text;
+}
+.topbar{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;
+  background:rgba(13,110,253,0.9);
+  flex-shrink:0;
+  display: none; /* ซ่อน Topbar ดั้งเดิมเนื่องจากใช้เฟรมแท้ของระบบในการคุม */
+}
+#textBox{
+  flex:1;
+  padding:16px 20px;
+  font-size:22px;
+  line-height:1.9;
+  color:#fff;
+  overflow-y:auto;
+  word-break:break-word;
+}
+#textBox.empty{font-size:14px;color:rgba(255,255,255,0.4);font-style:italic}
+.sizebar{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px;
+  background:rgba(0,0,0,0.5);
+  font-size:11px;color:rgba(255,255,255,0.5);
+  flex-shrink:0;
+}
+.sizebar input{width:50px;padding:2px 5px;border:1px solid rgba(255,255,255,0.2);border-radius:4px;font-size:11px;text-align:center;background:rgba(255,255,255,0.1);color:#fff}
+.ctrl-btn{
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;
+  padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;margin-right:6px;
+}
+.ctrl-btn:hover{background:rgba(255,255,255,0.3)}
+#dot{width:8px;height:8px;border-radius:50%;background:#6ee7a0;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+#dot.blink{animation:pulse 1s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div id="textBox" class="empty">รอข้อความจากเกม...</div>
+<div class="sizebar">
+  <div id="dot"></div>
+  <span id="statusTxt">รอ</span>
+  <span style="margin-left:10px">โหมดพื้นหลัง:</span>
+  <button id="bgBtn" class="ctrl-btn">🌑</button>
+  <span style="margin-left:auto">ขนาด:</span>
+  <input type="number" id="fontSize" value="22" min="12" max="60" step="2">px
+  <span id="updateTime">—</span>
+</div>
+
+<script>
+let lastText='';
+let bgMode=0;
+
+// ปรับขนาดอักษร
+document.getElementById('fontSize').oninput=function(){
+  document.getElementById('textBox').style.fontSize=this.value+'px';
+};
+
+// เปลี่ยนสีธีมพื้นหลัง
+const bgStyles=[
+  'rgba(0,0,0,0.82)',
+  'rgba(255,255,255,0.95)',
+  'rgba(20,20,20,0.5)'
+];
+const textColors=['#fff','#111','#fff'];
+document.getElementById('bgBtn').onclick=function(){
+  bgMode=(bgMode+1)%3;
+  document.body.style.background=bgStyles[bgMode];
+  document.getElementById('textBox').style.color=textColors[bgMode];
+  this.textContent=['🌑','☀️','🌓'][bgMode];
+};
+
+// ลูปสำรอง (Fallback) คอยดึงข้อมูลจาก localStorage ในกรณีเปิดหน้าต่างแยกเดี่ยวๆ
+function poll(){
+  try{
+    const text=localStorage.getItem('screenlingo_text')||'';
+    const time=localStorage.getItem('screenlingo_time')||'';
+    if(text && text!==lastText){
+      lastText=text;
+      const el=document.getElementById('textBox');
+      el.textContent=text;
+      el.classList.remove('empty');
+      document.getElementById('updateTime').textContent=time;
+      document.getElementById('statusTxt').textContent='อัปเดตแล้ว';
+      const dot=document.getElementById('dot');
+      dot.classList.add('blink');
+      setTimeout(()=>dot.classList.remove('blink'),1500);
+    }
+  }catch(e){}
+}
+setInterval(poll,800);
+</script>
+</body>
+</html>
