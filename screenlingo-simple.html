@@ -91,10 +91,12 @@ video{max-width:100%;max-height:100%;object-fit:contain;display:none}
 
 <div class="instruction">
   💡 <strong>วิธีใช้:</strong>
-  1) คลิก <strong>จับภาพหน้าจอ</strong> แล้วเลือกหน้าต่างเกม &nbsp;|&nbsp;
-  2) คลิก <strong>กำหนดพื้นที่</strong> แล้วลากครอบกล่องบทสนทนา &nbsp;|&nbsp;
-  3) คลิก <strong>เริ่มสแกน</strong> &nbsp;|&nbsp;
-  4) เมื่อข้อความปรากฏในกล่องล่าง ให้ <strong>คลิกขวา → แปลภาษา</strong> ใน Chrome
+  1) คลิก <strong>📺 จับภาพหน้าจอ</strong> → เลือกหน้าต่างเกม &nbsp;|&nbsp;
+  2) คลิก <strong>✏️ กำหนดพื้นที่</strong> → ลากครอบกล่องบทสนทนาให้ใหญ่พอ &nbsp;|&nbsp;
+  3) เลือก <strong>🎨 โหมดสี</strong> ให้ตรงกับสีข้อความในเกม (ขาว/ดำ/หยิบสี/อัตโนมัติ) &nbsp;|&nbsp;
+  4) คลิก <strong>▶ เริ่มสแกน</strong> → ข้อความจะแสดงในกล่องด้านล่าง &nbsp;|&nbsp;
+  5) คลิกขวาที่หน้าจอ → <strong>แปลภาษาเป็นไทย</strong> เพื่อแปล &nbsp;|&nbsp;
+  6) คลิก <strong>🪟 เปิดป็อปอัปบนสุด</strong> → กล่องข้อความจะลอยเหนือเกมเสมอ
 </div>
 
 <div class="top">
@@ -563,21 +565,7 @@ function showText(text){
   }catch(e){}
 }
 
-// ── Sync translated text from main panel to pip ───────
-// When Chrome translates the page, it changes the DOM text
-// MutationObserver catches that and sends to pip window
-const ocrBodyEl = document.getElementById('ocrPanelBody');
-const syncObserver = new MutationObserver(() => {
-  const translatedText = ocrBodyEl.textContent;
-  if(!translatedText || ocrBodyEl.classList.contains('empty')) return;
-  const time = document.getElementById('ocrMeta').textContent;
-  lingoChannel.postMessage({ type: 'update', text: translatedText, time: time });
-  try{
-    localStorage.setItem('screenlingo_text', translatedText);
-    localStorage.setItem('screenlingo_time', time);
-  }catch(e){}
-});
-syncObserver.observe(ocrBodyEl, { childList: true, subtree: true, characterData: true });
+// ── Auto loop ─────────────────────────────────────────
 document.getElementById('startLoopBtn').onclick=async()=>{
   await initOCR(); startLoop();
 };
