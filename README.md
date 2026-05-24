@@ -1,95 +1,166 @@
 # 🎮 ScreenLingo
 
-**ScreenLingo** is a browser-based live OCR overlay tool for gamers. It captures your game window, reads on-screen text using OCR, and displays it in a clean draggable panel — so you can read game dialog in any language without leaving the game.
+**ScreenLingo** คือเครื่องมืออ่านข้อความในเกมแบบอัตโนมัติ ทำงานบน Browser ไม่ต้องติดตั้งโปรแกรมใด ๆ ใช้ OCR อ่านข้อความจากหน้าจอเกม แล้วแสดงผลในกล่องข้อความที่ลากวางได้ และ popup อยู่บนสุดเสมอ (Always on Top)
+
+> **ScreenLingo** is a browser-based live OCR overlay for gamers. No installation required. Captures your game window, reads on-screen text automatically, and displays it in a draggable panel and an always-on-top popup window.
 
 ---
 
-## ✨ Features
+## ✨ คุณสมบัติ / Features
 
-- 📺 **Screen capture** — capture any game window directly in the browser
-- ✏️ **Region selection** — draw a box over the dialog area for precise OCR
-- 🔍 **Auto scan loop** — scans every N seconds, only updates when text changes
-- 🧹 **Smart noise filtering** — removes UI chrome, symbols, and short noise tokens
-- ⬜ **White text mode** — preprocesses image for white-on-dark text (inverts + thresholds)
-- 📖 **Draggable text panel** — floats over the preview, resizable, adjustable font size
-- 🇹🇭🇬🇧🇯🇵 **Multi-language OCR** — supports English, Thai, and Japanese
-- 🚫 **Duplicate skip** — fingerprints Thai/English/Japanese content to skip repeat scans
-- 🌐 **Thai UI** — all buttons and instructions in Thai
+| คุณสมบัติ | รายละเอียด |
+|-----------|------------|
+| 📺 จับภาพหน้าจอ | ใช้ Screen Capture API จับภาพหน้าต่างเกมโดยตรง |
+| ✏️ กำหนดพื้นที่ OCR | ลากเพื่อเลือกบริเวณที่มีข้อความบทสนทนา |
+| 🔄 สแกนอัตโนมัติ | สแกนซ้ำทุก N วินาที ตรวจจับการเปลี่ยนแปลงด้วย Frame Diff |
+| 🧹 กรองสัญญาณรบกวน | ตัดข้อความ UI, สัญลักษณ์, และตัวอักษรสั้น ๆ ออกอัตโนมัติ |
+| ⬜ โหมดข้อความสีขาว | ปรับภาพก่อน OCR สำหรับตัวอักษรสีขาวบนพื้นหลังมืด |
+| 📖 กล่องข้อความลากได้ | กล่องข้อความลอยอยู่เหนือ Preview ลากวางและปรับขนาดได้ |
+| 🪟 Popup อยู่บนสุด | ใช้ Document Picture-in-Picture API สร้างหน้าต่างลอยเหนือทุกอย่าง |
+| 🌐 แปลภาษาด้วย Chrome | คลิกขวา → แปลภาษา บนหน้าหลัก ข้อความแปลแล้วจะซิงค์ไปยัง Popup อัตโนมัติ |
+| 🇹🇭🇬🇧🇯🇵 รองรับหลายภาษา | OCR รองรับ ภาษาอังกฤษ, ไทย และญี่ปุ่น |
+| 🔁 ข้ามข้อความซ้ำ | ใช้ Fingerprint เปรียบเทียบเนื้อหาจริง ไม่ใช่ Pixel เพื่อข้ามข้อความซ้ำ |
 
 ---
 
-## 🚀 How to Use
+## 📁 ไฟล์ในโปรเจกต์ / Project Files
 
-### 1. Open with Chrome (CORS bypass required)
+```
+screenlingo/
+├── screenlingo-simple.html   ← แอปหลัก (Main App)
+├── screenlingo-popup.html    ← ป็อปอัปแบบแยกไฟล์ (Standalone Popup)
+└── README.md                 ← ไฟล์นี้
+```
+
+> **หมายเหตุ:** `screenlingo-popup.html` ใช้สำหรับกรณีที่เบราว์เซอร์ไม่รองรับ Document Picture-in-Picture  
+> หากใช้ Chrome 116+ ให้ใช้ปุ่ม **🪟 เปิดป็อปอัปบนสุด** ใน `screenlingo-simple.html` แทน
+
+---
+
+## 🚀 วิธีติดตั้งและใช้งาน / How to Use
+
+### ขั้นตอนที่ 1 — เปิดด้วย Chrome (จำเป็น)
+
+เนื่องจากแอปนี้ต้องเข้าถึงไฟล์ในเครื่อง ต้องเปิด Chrome ด้วยคำสั่งพิเศษ:
 
 ```cmd
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:\ChromeDev" --allow-file-access-from-files "C:\PATH\TO\screenlingo-simple.html"
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:\ChromeDev" --allow-file-access-from-files "C:\Users\ชื่อผู้ใช้\Downloads\screenlingo-simple.html"
 ```
 
-### 2. Steps inside the app
-
-1. คลิก **📺 จับภาพหน้าจอ** → เลือกหน้าต่างเกม
-2. คลิก **✏️ กำหนดพื้นที่** → ลากครอบกล่องบทสนทนา
-3. คลิก **▶ เริ่มสแกน** → OCR จะอ่านข้อความอัตโนมัติ
-4. ข้อความจะแสดงในกล่องลาก-วางได้ด้านล่าง
-5. คลิกขวาที่กล่องข้อความ → **แปลภาษา** ใน Chrome เพื่อแปลเป็นภาษาไทย
+> 💡 แทน `ชื่อผู้ใช้` ด้วยชื่อ User Windows ของคุณ เช่น `bom`
 
 ---
 
-## 📋 Requirements
-
-- **Google Chrome** (any modern version)
-- No installation, no server, no API key needed
-- Internet connection (for OCR language pack download on first use)
-
----
-
-## 📁 Files
-
-| File | Description |
-|------|-------------|
-| `screenlingo-simple.html` | Main app — single file, open directly in Chrome |
-| `README.md` | This file |
-
----
-
-## ⚙️ Settings
-
-| Setting | Description |
-|---------|-------------|
-| ทุก N วินาที | Scan interval (2–15 seconds) |
-| ⬜ ข้อความสีขาว | White text mode — best for light text on dark backgrounds |
-| 📖 แสดงกล่องข้อความ | Show/hide the floating OCR text panel |
-
----
-
-## 🔧 How It Works
+### ขั้นตอนที่ 2 — ใช้งานในแอป
 
 ```
-Game window
-    ↓  Screen Capture API (browser)
-Preview in ScreenLingo
-    ↓  Draw region over dialog box
-Crop selected area
-    ↓  Tesseract.js OCR (eng+jpn)
-Raw text
-    ↓  Noise filter (Thai/English/Japanese line detection)
-Clean text
-    ↓  Fingerprint dedup (skip if same content)
-Display in draggable panel
+1. คลิก [📺 จับภาพหน้าจอ]
+   → เลือกหน้าต่างเกมที่ต้องการอ่านข้อความ
+
+2. คลิก [✏️ กำหนดพื้นที่]
+   → ลากครอบบริเวณกล่องบทสนทนาในเกม (dialog box)
+   → ยิ่งครอบแน่น ยิ่งแม่นยำ
+
+3. คลิก [▶ เริ่มสแกน]
+   → แอปจะอ่านข้อความอัตโนมัติทุก 3 วินาที
+   → ข้อความใหม่จะปรากฏในกล่องข้อความด้านล่าง
+
+4. แปลภาษา (ไม่บังคับ)
+   → คลิกขวาที่หน้าจอหลัก → "แปลเป็นภาษาไทย"
+   → ข้อความที่แปลแล้วจะซิงค์ไปยัง Popup อัตโนมัติ
+
+5. คลิก [🪟 เปิดป็อปอัปบนสุด]
+   → เปิดหน้าต่างลอยเหนือเกม (Always on Top)
+   → ลากวางตำแหน่งได้ตามต้องการ
+   → กดปุ่ม 🌑 เพื่อเปลี่ยนธีมสีพื้นหลัง
 ```
 
 ---
 
-## 📝 Notes
+## ⚙️ การตั้งค่า / Settings
 
-- **White text mode** inverts and thresholds the image before OCR — helps with games that have white/colored text on dark backgrounds
-- **Frame diff** compares pixel changes before running OCR to save CPU
-- **Text fingerprint** uses only Thai characters + English words (4+ letters) for dedup, ignoring UI noise
-- Chrome's built-in **Translate Page** feature can be used to translate the detected text
+| การตั้งค่า | รายละเอียด |
+|-----------|------------|
+| **ทุก N วินาที** | ความถี่ในการสแกน (2–15 วินาที) |
+| **⬜ ข้อความสีขาว: เปิด/ปิด** | เปิดใช้เมื่อตัวอักษรในเกมเป็นสีขาวบนพื้นหลังมืด |
+| **ขนาดตัวอักษร** | ปรับขนาดตัวอักษรในกล่องข้อความและ Popup |
+| **📖 แสดงกล่องข้อความ** | แสดงกล่องข้อความที่ซ่อนอยู่ |
+| **🪟 เปิดป็อปอัปบนสุด** | เปิดหน้าต่าง Always on Top (ต้องใช้ Chrome 116+) |
+
+---
+
+## 🔧 หลักการทำงาน / How It Works
+
+```
+หน้าจอเกม (Game Window)
+        ↓  Screen Capture API
+Preview ใน ScreenLingo
+        ↓  ลากเลือกพื้นที่ Dialog Box
+ตัดภาพเฉพาะส่วน (Crop Region)
+        ↓  Frame Diff (เปรียบเทียบ Pixel)
+     มีการเปลี่ยนแปลง?
+        ↓  ใช่ → Tesseract.js OCR (eng+jpn)
+ข้อความดิบ (Raw Text)
+        ↓  กรองสัญญาณรบกวน (Noise Filter)
+ข้อความสะอาด (Clean Text)
+        ↓  Fingerprint Dedup (ข้ามถ้าซ้ำ)
+แสดงในกล่องข้อความหลัก
+        ↓  Chrome Translate (คลิกขวา)
+ข้อความแปลแล้ว
+        ↓  MutationObserver + BroadcastChannel
+แสดงใน Popup Always on Top
+```
+
+---
+
+## 🖥️ ความต้องการของระบบ / Requirements
+
+| รายการ | รายละเอียด |
+|--------|------------|
+| **Browser** | Google Chrome 116+ หรือ Microsoft Edge 116+ |
+| **OS** | Windows 10/11 (แนะนำ), macOS, Linux |
+| **Internet** | ต้องการเชื่อมต่อครั้งแรกสำหรับดาวน์โหลด OCR Language Pack |
+| **API Key** | ไม่ต้องการ — ฟรี 100% |
+| **Installation** | ไม่ต้องติดตั้ง — เปิดไฟล์ HTML ได้เลย |
+
+---
+
+## ❓ คำถามที่พบบ่อย / FAQ
+
+**Q: ทำไมต้องเปิด Chrome ด้วย `--disable-web-security`?**  
+A: เพราะแอปต้องโหลด Tesseract.js จาก CDN และเข้าถึงไฟล์ในเครื่อง ซึ่งถูกบล็อกโดยนโยบาย CORS ของ Browser ปกติ
+
+**Q: ปุ่ม 🪟 เปิดป็อปอัปบนสุด ใช้ไม่ได้?**  
+A: ต้องใช้ Chrome หรือ Edge เวอร์ชัน 116 ขึ้นไป และต้องเปิดด้วย Flag ที่กำหนดข้างต้น
+
+**Q: OCR อ่านผิดหรืออ่านได้ไม่ครบ?**  
+A: ลองปรับพื้นที่ให้ครอบแน่นขึ้น และเปิด **โหมดข้อความสีขาว** หากตัวอักษรในเกมเป็นสีอ่อนบนพื้นหลังมืด
+
+**Q: Popup แสดงข้อความภาษาอังกฤษ ไม่ใช่ไทย?**  
+A: ต้องแปลหน้าหลักก่อนโดยคลิกขวา → แปลภาษา จากนั้น Popup จะซิงค์ข้อความที่แปลแล้วอัตโนมัติ
+
+**Q: ใช้กับเกมอะไรได้บ้าง?**  
+A: ใช้ได้กับเกมทุกประเภทที่มีข้อความบทสนทนาบนหน้าจอ เช่น JRPG, Visual Novel, MMO, และเกมแนว Story-driven
+
+---
+
+## 📝 หมายเหตุ / Notes
+
+- **โหมดข้อความสีขาว** จะ Invert + Threshold ภาพก่อนส่งให้ OCR เหมาะกับเกมที่ตัวอักษรสีขาวบนพื้นหลังมืด
+- **Frame Diff** เปรียบเทียบ Pixel ก่อนรัน OCR เพื่อประหยัด CPU — OCR จะทำงานเฉพาะเมื่อหน้าจอเปลี่ยน
+- **Text Fingerprint** ใช้ตัวอักษรไทย + ญี่ปุ่น + คำภาษาอังกฤษ (4+ ตัว) เพื่อเปรียบเทียบว่าข้อความซ้ำหรือไม่
+- **MutationObserver** คอยตรวจจับการเปลี่ยนแปลงของ DOM เมื่อ Chrome แปลหน้า แล้วส่งข้อความที่แปลแล้วไปยัง Popup
 
 ---
 
 ## 📜 License
 
-MIT — free to use, modify, and share.
+MIT License — ใช้งาน แก้ไข และแจกจ่ายได้ฟรี
+
+---
+
+## 🙏 Credits
+
+- [Tesseract.js](https://github.com/naptha/tesseract.js) — OCR Engine
+- [Google Fonts — Sarabun](https://fonts.google.com/specimen/Sarabun) — Thai Font
+- [Document Picture-in-Picture API](https://developer.chrome.com/docs/web-platform/document-picture-in-picture/) — Always on Top Window
