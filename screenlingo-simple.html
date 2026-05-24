@@ -155,7 +155,6 @@ video{max-width:100%;max-height:100%;object-fit:contain;display:none}
         <option value="ko">KO</option>
         <option value="ja">JA</option>
       </select>
-      <button id="autoTransBtn" style="padding:3px 10px;border-radius:6px;font-size:11px;font-family:'Sarabun',sans-serif;cursor:pointer;border:1px solid #ced4da;background:#fff;color:#495057;white-space:nowrap">🌐 แปล: ปิด</button>
       <span class="panel-meta" id="ocrMeta">—</span>
       <button class="panel-close" id="panelClose" title="ปิด">✕</button>
     </div>
@@ -636,8 +635,8 @@ function updatePipContent(text, time) {
   }
 }
 
-// ── Auto translate ────────────────────────────────────
-let autoTranslate=false;
+// ── Auto translate (always on) ────────────────────────
+const autoTranslate=true;
 
 async function translateText(text,tl){
   const url=`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
@@ -646,15 +645,6 @@ async function translateText(text,tl){
   const data=await res.json();
   return data[0].map(c=>c[0]).join('');
 }
-
-document.getElementById('autoTransBtn').onclick=function(){
-  autoTranslate=!autoTranslate;
-  this.textContent='🌐 แปล: '+(autoTranslate?'เปิด':'ปิด');
-  this.style.background=autoTranslate?'#198754':'#fff';
-  this.style.color=autoTranslate?'#fff':'#495057';
-  this.style.borderColor=autoTranslate?'#198754':'#ced4da';
-  log('แปลอัตโนมัติ: '+(autoTranslate?'เปิด':'ปิด'),'info');
-};
 
 // แสดงข้อความ (แปลก่อนถ้าเปิดโหมดแปล) แล้วส่งไป popup
 async function showText(text){
@@ -675,6 +665,7 @@ async function showText(text){
   document.getElementById('ocrMeta').textContent=time;
   document.getElementById('ocrPanel').style.display='block';
   lingoChannel.postMessage({type:'update',text:display,time:time});
+  updatePipContent(display,time);
   try{
     localStorage.setItem('screenlingo_text',display);
     localStorage.setItem('screenlingo_time',time);
